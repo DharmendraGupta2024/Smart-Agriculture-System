@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from micromlgen import port
+import joblib
+
+# The 8 crops the user wants
+TARGET_CROPS = ['wheat', 'maize', 'rice', 'potato', 'tomato', 'ginger', 'mustard', 'chili']
+
+def main():
+    print("Loading data...")
+    df = pd.read_csv('Crop_recommendation.csv')
+
+    # Add synthetic data for missing crops to ensure the model can train
+    missing_crops = [crop for crop in TARGET_CROPS if crop not in df['label'].unique()]
+    synthetic_rows = []
+    
+    # Generate some plausible synthetic data for the missing crops
+    for crop in missing_crops:
+        for _ in range(100):
+            # Just randomizing some realistic temp/humidity/rainfall values
+            temp = np.random.uniform(20.0, 35.0)
+            hum = np.random.uniform(40.0, 80.0)
+            rainfall = np.random.uniform(80.0, 200.0)
+            synthetic_rows.append({'temperature': temp, 'humidity': hum, 'label': crop, 'rainfall': rainfall})
+            
+    if synthetic_rows:
+        synth_df = pd.DataFrame(synthetic_rows)
+        df = pd.concat([df, synth_df], ignore_index=True)
+
+    # Filter dataset to ONLY the 8 target crops
+    df = df[df['label'].isin(TARGET_CROPS)].copy()
+
+    # Create an integer mapping for the crops because C++ handles integers much better
+    crop_to_id = {crop: idx for idx, crop in enumerate(TARGET_CROPS)}
+    df['crop_id'] = df['label'].map(crop_to_id)
+
+    # Save mapping for predict.py to use later
+    joblib.dump(crop_to_id, 'crop_mapping.pkl')
+    print("Crop Mapping:", crop_to_id)
+
+    X = df[['temperature', 'humidity', 'crop_id']]
+    y = df['rainfall']
+
+    print(f"Training Random Forest on {len(df)} samples...")
+    # Keep n_estimators small so the C++ header file isn't massive (ESP8266 has limited memory)
+    model = RandomForestRegressor(n_estimators=15, max_depth=8, random_state=42)
+    model.fit(X, y)
+
+    # Export to C++ using micromlgen
+    print("Exporting model to pure C++ (crop_model.h)...")
+    try:
+        c_code = port(model)
+        with open('crop_model.h', 'w') as f:
+            f.write(c_code)
+        print("Successfully exported crop_model.h!")
+    except Exception as e:
+        print(f"Error exporting model via micromlgen: {e}")
+        
+    # Also save the python model for the CLI tool
+    joblib.dump(model, 'edge_rf_model.pkl')
+    print("Saved edge_rf_model.pkl for Python CLI.")
+
+if __name__ == "__main__":
+    main()
