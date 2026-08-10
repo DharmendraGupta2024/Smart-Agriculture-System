@@ -101,8 +101,7 @@ The **Smart Agriculture System** uses field-deployed IoT sensors to monitor real
 
 ## ☁️ Azure Cloud Infrastructure & DevOps Pipeline
 
-### My Primary Role & Responsibilities
-My primary focus was designing, provisioning, securing, and automating the **Azure Cloud Infrastructure and DevOps CI/CD Pipelines**.
+The cloud deployment utilizes an enterprise-grade **Azure Cloud Infrastructure** paired with an **Azure DevOps CI/CD Pipeline** for automated model retraining, verification, and seamless service deployment.
 
 ```text
                AZURE DEVOPS CI/CD PIPELINE
@@ -131,29 +130,27 @@ My primary focus was designing, provisioning, securing, and automating the **Azu
 
 ### Key Cloud Components
 
-#### 1. Azure Resource Group (`rg-smart-agriculture-prod`)
-- Acts as a unified logical container for all cloud assets.
-- Simplifies environment lifecycle, resource tracking, and cost management.
+#### 1. Azure Resource Group
+- Logical container managing all production cloud assets for unified environment lifecycle, tracking, and cost governance.
 
-#### 2. Azure Virtual Network (VNet) & Subnet Segmentation (`vnet-smartagri-prod`)
-- Provisioned a `10.0.0.0/16` CIDR block split into 3 isolated subnets:
-  - `sn-app` (`10.0.1.0/24`): Hosts the Flask Prediction API.
-  - `sn-ml-training` (`10.0.2.0/24`): Isolated ML training and evaluation workloads.
-  - `sn-database` (`10.0.3.0/24`): Reserved for database storage.
-- Enforces network-level isolation following the principle of least privilege.
+#### 2. Virtual Network (VNet) & Subnet Isolation
+- Isolated Virtual Network split into 3 segmented subnets following the principle of least privilege:
+  - **App Subnet**: Hosts the prediction Flask API service.
+  - **ML Subnet**: Dedicated for model training, execution, and evaluation tasks.
+  - **Database Subnet**: Dedicated storage layer.
 
-#### 3. Azure Virtual Machine (`vm-smartagri-ml`)
-- Ubuntu 22.04 LTS instance using **Standard_B2s** (2 vCPUs, 4GB RAM) burstable compute size.
-- B-series accumulates CPU credits during low activity and bursts during model retraining, reducing cloud operational costs.
+#### 3. Azure Virtual Machine (Burstable Instance)
+- Ubuntu 22.04 LTS compute node with burstable CPU capability.
+- Accumulates compute credits during idle periods and bursts during model retraining, minimizing cloud operational costs.
 
 #### 4. Network Security Group (NSG) Firewall Rules
-- **Port 22 (SSH)**: Strictly restricted to authorized administrator public IP addresses.
-- **Port 5000 (Flask API)**: Allowed only within VNet internal traffic.
-- **Port 443 (HTTPS)**: Open for secure TLS external endpoint access.
-- Implements Zero-Trust security rules with implicit deny-all defaults.
+- **Port 22 (SSH)**: Strictly restricted to administrator public IP addresses.
+- **Port 5000 (Flask API)**: Restrictive internal VNet traffic routing.
+- **Port 443 (HTTPS)**: Secure external TLS API endpoint access.
+- Enforces Zero-Trust security rules with implicit deny-all defaults.
 
 #### 5. Automated CI/CD Pipeline (Azure DevOps)
-- **Build Stage**: Retrains model, evaluates metrics ($R^2$, $MAE$, $MSE$), generates C++ edge headers, and publishes `.pkl` build artifacts.
+- **Build Stage**: Automatically retrains the model, calculates performance metrics ($R^2$, $MAE$, $MSE$), compiles C++ headers for microcontrollers, and bundles build artifacts.
 - **Deploy Stage**: Automated deployment to Azure VM via SSH, service restart, and API health checks.
 
 ---
@@ -249,3 +246,5 @@ python3 src/generate_plots.py
 
 ## 📜 License & Acknowledgments
 Developed as an advanced academic project integrating IoT Hardware, Machine Learning, and Azure DevOps Infrastructure.
+
+
