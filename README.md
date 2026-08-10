@@ -23,7 +23,7 @@ An end-to-end automated precision irrigation solution powered by **IoT Edge Inte
 
 ---
 
-## 📌 Problem Statement & Motivation
+## 📌 Problem Statement
 
 In modern agriculture, farmers face significant challenges in estimating exact crop water requirements. Traditional manual practices frequently cause **over-irrigation** or **under-irrigation**, leading to:
 - ❌ Massive water and electricity wastage.
@@ -244,24 +244,6 @@ python3 src/predict.py
 python3 src/compare_models.py
 python3 src/generate_plots.py
 ```
-
----
-
-## 🎤 Interview Cheatsheet & Presentation Guide
-
-### 📌 1-Line Pitch
-> *"I worked on a Smart Agriculture System that uses IoT sensors, Edge ML, and Azure Cloud Infrastructure to automate precision irrigation — and my core role was building the complete Azure Cloud Infrastructure and DevOps CI/CD pipeline."*
-
-### 🎯 Key Interview Questions & Answers
-
-#### Q1: "What was your exact role in DevOps?"
-> *"I designed and managed the Azure Cloud Infrastructure and automation. I created the Resource Group for organization, set up the VNet with 3 subnets for network segmentation, provisioned an Ubuntu VM for model hosting, configured NSG rules for zero-trust security, and built the Azure DevOps CI/CD Pipeline to automate model training and deployment."*
-
-#### Q2: "Why did you use Edge ML instead of calling Cloud API every time?"
-> *"Agricultural fields often have weak or intermittent internet connectivity. By converting the Random Forest model into a pure C++ header file (`crop_model.h`) using `micromlgen`, the NodeMCU ESP8266 performs predictions locally offline without relying on constant cloud availability."*
-
-#### Q3: "Why did you select a B-series VM on Azure?"
-> *"The B-series burstable VM accumulates CPU credits during idle hours and uses them when retraining models or processing requests. Since our ML workload is intermittent, B-series significantly reduces cloud compute costs compared to fixed D-series VMs."*
 
 ---
 
